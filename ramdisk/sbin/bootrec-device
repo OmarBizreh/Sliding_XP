@@ -1,0 +1,28 @@
+#!/sbin/sh
+
+# trigger purple LED
+echo '255' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/blue/brightness
+echo '255' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/red/brightness
+echo '255' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/green/brightness
+
+# trigger vibration
+echo '50' > /sys/class/timed_output/vibrator/enable
+
+# trigger button-backlight
+echo '255' > /sys/class/leds/so34-led0/brightness
+echo '255' > /sys/class/leds/so34-led1/brightness
+echo '255' > /sys/class/leds/so34-led2/brightness
+cat /dev/input/event1 > /dev/keycheck&
+sleep 3
+
+# trigger purple LED
+echo '0' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/blue/brightness
+echo '0' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/red/brightness
+echo '0' > /sys/devices/platform/nmk-i2c.2/i2c-2/2-0036/leds/green/brightness
+
+# trigger button-backlight
+echo '0' > /sys/class/leds/so34-led0/brightness
+echo '0' > /sys/class/leds/so34-led1/brightness
+echo '0' > /sys/class/leds/so34-led2/brightness
+
+kill -9 $!
