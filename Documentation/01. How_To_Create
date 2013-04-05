@@ -1,0 +1,18 @@
+How To Create Custom Kernel For Sony Xperia:
+------------------------------------------------
+1. Clone Toolchains (or you can use your own toolchains): git clone https://github.com/OmarBizreh/Toolchains-1.git
+2. In terminal "cd" to your source code directory.
+3. Execute the following: 
+	A. export ARCH=arm
+	B. export CROSS_COMPILE=Path_To_Your_ToolChains
+4. Now time to use your device configuration:
+	A. Xperia P => make riogrande_nypon_defconfig
+	B. Xperia U => make riogrande_kumquat_defconfig
+	C. Xperia Sola => make riogrande_pepper_defconfig
+	D. Xperia Go => make riogrande_lotus_defconfig
+5. Now time to build the kernel:
+	A. make -jX ==> /* X = number of your machine CPU Cores + 1. */
+6. When building is done, execute "MakeFile.sh" to create your boot.img and kernel.elf
+------------------------------------------------
+Notes:
+Use Kernel.elf file to create a CWM flashable file.

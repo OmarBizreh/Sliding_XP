@@ -1,0 +1,18 @@
+ui_print("-------------------------------");
+ui_print("|  Sliding_XP CWM Installer   |");
+ui_print("-------------------------------");
+
+ui_print("-- Wiping Dalvik Cache ...");
+run_program("/sbin/busybox", "mount", "/data");
+run_program("/sbin/busybox", "rm", "-rf", "/data/dalvik-cache");
+
+ui_print("-- Flashing Sliding_XP Kernel");
+
+assert(package_extract_file("kernel.elf", "/tmp/kernel.elf"),
+       write_raw_image("/tmp/kernel.elf", "/dev/block/mmcblk0p9"),
+       delete("/tmp/kernel.elf"));
+
+ui_print("-------------------------------");
+ui_print("|  Flashing Complete Enjoy     |");
+ui_print("-------------------------------");
+
