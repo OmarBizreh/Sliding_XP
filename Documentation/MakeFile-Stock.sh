@@ -29,8 +29,8 @@ echo "-- Copying WiFi Modules ..."
 # Get Wi-Fi Modules
 if [[ ( -f ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_core.ko && -f ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_wlan.ko ) ]]; then
 	echo "-- Wifi modules found, copying Wifi moduels to ramdisk folder"
-	cp ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_core.ko ../ramdisk/lib/modules/
-	cp ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_wlan.ko ../ramdisk/lib/modules/
+	cp ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_core.ko ../ramdisk/lib/modules/3.0.8+/kernel/net/compat-wireless/drivers/staging/cw1200
+	cp ../kernel/net/compat-wireless/drivers/staging/cw1200/cw1200_wlan.ko ../ramdisk/lib/modules/3.0.8+/kernel/net/compat-wireless/
 else
 	echo "-- Can't find Wifi module, please check your build enviroment (Aborting Process)"
 	exit 2
