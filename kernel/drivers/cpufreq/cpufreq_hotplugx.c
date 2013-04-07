@@ -32,12 +32,14 @@
 #include <linux/err.h>
 #include <linux/slab.h>
 #include <linux/earlysuspend.h>
-
+#include "symsearch.h"
+SYMSEARCH_DECLARE_FUNCTION_STATIC(int, cpu_up_s, unsigned int);
 // used for suspend code
 static unsigned int susp_enabled = 0;
 static unsigned int suspended = 0;
 static unsigned int registration = 0;
 static unsigned int suspend_cpu_up = 95;
+static unsigned int highfreq = 1000000;
 
 /* greater than 80% avg load across online CPUs increases frequency */
 #define DEFAULT_UP_FREQ_MIN_LOAD (80)
@@ -531,7 +533,7 @@ dbs_tuners_ins.up_threshold) {
 * wq is not running here so its safe.
 */
 mutex_unlock(&this_dbs_info->timer_mutex);
-cpu_up(1);
+cpu_up_s(1);
 mutex_lock(&this_dbs_info->timer_mutex);
 goto out;
 }
@@ -539,6 +541,11 @@ goto out;
 
 /* check for frequency increase based on max_load */
 if (max_load > dbs_tuners_ins.up_threshold) {
+// imosey go to highest freq only if load is really high
+if (max_load < suspend_cpu_up && highfreq <= policy->max)
+__cpufreq_driver_target(policy, highfreq,
+CPUFREQ_RELATION_H);
+else
 /* increase to highest frequency supported */
 if (policy->cur < policy->max)
 __cpufreq_driver_target(policy, policy->max,
@@ -603,6 +610,7 @@ static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 {
 /* We want all related CPUs to do sampling nearly on same jiffy */
 int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
+delay -= jiffies % delay;
 
 INIT_DELAYED_WORK_DEFERRABLE(&dbs_info->work, do_dbs_timer);
 queue_delayed_work_on(dbs_info->cpu, khotplug_wq, &dbs_info->work,
@@ -619,7 +627,7 @@ static void hotplug_suspend(int suspend)
 if (!susp_enabled) return;
         if (!suspend) {
 suspended = 0;
-if (num_online_cpus() < 2) cpu_up(1);
+if (num_online_cpus() < 2) cpu_up_s(1);
 pr_info("[imoseyon] hotplugx awake cpu1 up\n");
 } else {
 suspended = 1;
@@ -744,6 +752,7 @@ return 0;
 
 static int __init cpufreq_gov_dbs_init(void)
 {
+SYMSEARCH_BIND_FUNCTION_TO(hotplugx, cpu_up, cpu_up_s);
 int err;
 cputime64_t wall;
 u64 idle_time;
@@ -778,7 +787,7 @@ destroy_workqueue(khotplug_wq);
 }
 
 MODULE_AUTHOR("Mike Turquette <mturquette@ti.com>");
-MODULE_DESCRIPTION("'cpufreq_hotplug' - cpufreq governor for dynamic frequency scaling and CPU hotplugging");
+MODULE_DESCRIPTION("'cpufreq_hotplugX' - Hotplug governor + early suspend support & tweaks\nextra : Moto**** ported version.");
 MODULE_LICENSE("GPL");
 
 #ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_HOTPLUG
@@ -787,3 +796,5 @@ fs_initcall(cpufreq_gov_dbs_init);
 module_init(cpufreq_gov_dbs_init);
 #endif
 module_exit(cpufreq_gov_dbs_exit);
+
+
