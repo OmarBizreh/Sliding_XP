@@ -1,10 +1,10 @@
 #!/bin/bash
 #---------------------------------------------------------------------------
-#|									   |
-#|									   |
+#|									     	     |
+#|									  	     |
 #|Bash script for creating: Kernel.img, Kernel.elf, and CWM flashable file.|
-#|									   |
-#|									   |
+#|									            |
+#|									            |
 #---------------------------------------------------------------------------
 
 if [[ ( -e kernel-Stock.img && -e CWM-Stock.zip ) ]]; then
@@ -55,11 +55,4 @@ rm ramdisk.img
 rm zImage
 rm kernel.elf
 echo "-------------------------------"
-echo -e "-- All Done, Do you want to clean your build enviroment? Note: If you plane to run MakeFile-CM.sh after running this one YOU MUST NOT CLEAN YOUR BUILD ENVIRMOENT (y / n):"
-read Result
-if [[ "$result" -eq "y" ]]; then
-	cd ../kernel/
-	make clean
-else
-exit 2
-fi
+echo -e "-- All Done."
